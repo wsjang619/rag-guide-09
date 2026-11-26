@@ -22,7 +22,7 @@ async def version_headers(request: Request, call_next):
 
 
 class Question(BaseModel):
-    q: str = Field(min_length=2, max_length=2000)
+    q: str = Field(min_length=2, max_length=10000)
 
 
 @app.get("/health")
