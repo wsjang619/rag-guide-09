@@ -4,20 +4,36 @@ import os
 import time
 
 import boto3
+from botocore.exceptions import ClientError
 
 MODEL = os.environ.get("LLM_MODEL", "global.anthropic.claude-sonnet-5-5")
 client = boto3.client("bedrock-runtime", region_name=os.environ.get("AWS_REGION", "ap-northeast-2"))
 log = logging.getLogger("llm")
 
+MAX_RETRIES = 3        # 최초 호출 이후 재시도 횟수 (최대 호출 수 = 1 + 3)
+BASE_DELAY_SEC = 1.0   # 재시도 대기: 1s -> 2s -> 4s
+RETRYABLE_CODE = "ThrottlingException"
+
 
 def ask(system: str, user: str, max_tokens: int = 1024) -> dict:
     t0 = time.time()
-    resp = client.converse(
-        modelId=MODEL,
-        system=[{"text": system}],
-        messages=[{"role": "user", "content": [{"text": user}]}],
-        inferenceConfig={"maxTokens": max_tokens},
-    )
+    for attempt in range(MAX_RETRIES + 1):
+        try:
+            resp = client.converse(
+                modelId=MODEL,
+                system=[{"text": system}],
+                messages=[{"role": "user", "content": [{"text": user}]}],
+                inferenceConfig={"maxTokens": max_tokens},
+            )
+            break
+        except ClientError as e:
+            code = e.response.get("Error", {}).get("Code")
+            # ThrottlingException만 재시도. AccessDenied, ValidationException 등은 즉시 raise
+            if code != RETRYABLE_CODE or attempt == MAX_RETRIES:
+                raise
+            delay = BASE_DELAY_SEC * (2 ** attempt)
+            log.warning("ThrottlingException, %.1fs 후 재시도 (%d/%d)", delay, attempt + 1, MAX_RETRIES)
+            time.sleep(delay)
     text = "".join(b["text"] for b in resp["output"]["message"]["content"] if "text" in b)
     return {"text": text, "usage": resp["usage"], "stop": resp["stopReason"],
             "ms": int((time.time() - t0) * 1000)}
