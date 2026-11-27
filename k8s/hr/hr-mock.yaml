@@ -9,7 +9,7 @@ spec:
     spec:
       containers:
         - name: hr
-          image: <계정>.dkr.ecr.ap-northeast-2.amazonaws.com/rag-<번호>:hr-mock
+          image: 672381912436.dkr.ecr.ap-northeast-2.amazonaws.com/rag-09:hr-mock
           ports: [{ containerPort: 9000 }]
 ---
 apiVersion: v1
