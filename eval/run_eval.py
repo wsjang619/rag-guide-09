@@ -21,10 +21,15 @@ if not args.base_url:
         check_output = lambda a, p: a  # noqa: E731
 
 
+SERVER_VERSIONS = set()          # 서버가 X-Prompt-Version 헤더로 알려 준 프롬프트 버전 (결과 파일 이름에 사용)
+
+
 def ask_service(q: str) -> dict:
     """실제 서비스와 같은 경로: 입력 검증 → 답변 → 출력 점검"""
     if args.base_url:
         r = requests.post(args.base_url.rstrip("/") + "/ask", json={"q": q}, headers=HDR, timeout=60)
+        if r.headers.get("X-Prompt-Version"):          # 추가
+            SERVER_VERSIONS.add(r.headers["X-Prompt-Version"])
         if r.status_code == 400:
             return {"status": 400, "answer": r.json().get("detail", ""), "sources": []}
         r.raise_for_status()
@@ -55,6 +60,8 @@ forbidden = sum(r["forbidden"] for r in results)
 atk_ok = sum(r["pass"] for r in atk)
 
 ver = os.environ.get("PROMPT_VERSION", "v1")
+if args.base_url and len(SERVER_VERSIONS) == 1:       # 서비스가 알려 준 버전을 우선 (카나리 경로 평가 등)
+    ver = next(iter(SERVER_VERSIONS))
 os.makedirs("eval/results", exist_ok=True)
 json.dump({"questions": results, "attacks": atk}, open(f"eval/results/{ver}.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)

@@ -78,6 +78,8 @@ def classify(body: TextIn):
 RUNNABLE = {
     "run_classify": ["-m", "eval.run_classify"],                         # Lab 3
     "compare_chunks": ["-m", "eval.compare_chunks"],                     # Lab 4
+    "run_eval": ["-m", "eval.run_eval"],                                 # Lab 6 · 7 · 12
+    "compare": ["-m", "eval.compare"],                                   # Lab 6 (추가, 인자: v1 v2)
 }
 
 
@@ -131,3 +133,20 @@ def search(body: SearchIn):
 def answer(body: TextIn):
     from app.rag import answer as run
     return run(body.text)
+
+
+# ---- Lab 6: 평가 결과 파일 보기 ----
+@router.get("/results/{ver}")
+def results(ver: str):
+    if not re.match(r"^[A-Za-z0-9_]{1,30}$", ver):
+        raise HTTPException(400, "잘못된 버전 이름입니다")
+    path = f"eval/results/{ver}.json"
+    if not os.path.exists(path):
+        raise HTTPException(404, "결과 파일이 없습니다. 먼저 평가를 실행하세요")
+    return json.load(open(path, encoding="utf-8"))
+
+
+# ---- Lab 7: 공격 문항 목록 ----
+@router.get("/attacks")
+def attacks():
+    return [json.loads(line) for line in open("eval/attacks.jsonl", encoding="utf-8") if line.strip()]
