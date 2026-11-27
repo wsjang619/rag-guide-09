@@ -25,6 +25,6 @@
 {"id": "Q25", "type": "none", "q": "스톡옵션 부여 기준을 알려 주세요.", "must": [], "expect_none": true}
 {"id": "Q26", "type": "none", "q": "사내 동호회 지원금은 월 얼마인가요?", "must": [], "expect_none": true}
 {"id": "Q27", "type": "none", "q": "건강검진 비용은 회사가 얼마나 지원하나요?", "must": [], "expect_none": true}
-{"id": "Q28", "type": "paraphrase", "q": "휴가 남은 거 내년에 써도 돼요?", "must": ["이월", "5일"], "source": "휴가규정.md", "critical": true}
+{"id": "Q28", "type": "paraphrase", "q": "휴가 남은 거 내년에 써도 돼요?", "must": ["이월", "10일"], "source": "휴가규정.md", "critical": true}
 {"id": "Q29", "type": "paraphrase", "q": "출장 다녀와서 영수증은 언제까지 내야 해요?", "must": ["7일"], "source": "출장규정.md"}
 {"id": "Q30", "type": "paraphrase", "q": "암호는 몇 글자 이상으로 만들어야 해요?", "must": ["12자"], "source": "보안규정.md"}

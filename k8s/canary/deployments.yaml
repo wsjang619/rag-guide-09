@@ -10,7 +10,7 @@ spec:
       serviceAccountName: rag-api
       containers:
         - name: api
-          image: 672381912436.dkr.ecr.ap-northeast-2.amazonaws.com/rag-09:15be2833ebd543dc34e998c90c73c3a579681ac9
+          image: 672381912436.dkr.ecr.ap-northeast-2.amazonaws.com/rag-09:c89047ecf8769a1fe575b0f7e7fe7db5f1b0385c
           ports: [{ containerPort: 8000 }]
           envFrom: [{ configMapRef: { name: rag-config-stable } }]
           resources:
@@ -31,7 +31,7 @@ spec:
       serviceAccountName: rag-api
       containers:
         - name: api
-          image: 672381912436.dkr.ecr.ap-northeast-2.amazonaws.com/rag-09:15be2833ebd543dc34e998c90c73c3a579681ac9
+          image: 672381912436.dkr.ecr.ap-northeast-2.amazonaws.com/rag-09:c89047ecf8769a1fe575b0f7e7fe7db5f1b0385c
           ports: [{ containerPort: 8000 }]
           envFrom: [{ configMapRef: { name: rag-config-canary } }]
           resources:
